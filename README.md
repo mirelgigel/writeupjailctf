@@ -384,7 +384,7 @@ fn main(){std::panic::panic_any(std::fs::read_to_string("flag.txt").unwrap())}
 
 ______
 
-# Challenge: modelscan jailgolfpickle
+# Challenge: modelscan 
 
 **Category:** misc / pyjail
 **Author:** @quasarobizzaro
