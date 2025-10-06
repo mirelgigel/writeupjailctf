@@ -381,5 +381,100 @@ fn main(){std::panic::panic_any(std::fs::read_to_string("flag.txt").unwrap())}
 
 ______
 
+# Challenge: modelscan jailgolfpickle
+
+**Category:** misc / pyjail
+**Author:** @quasarobizzaro
+**Points:** 1337
+
+---
+
+## Problem
+
+The server reads a hex string, writes **only the first 23 bytes** to `/tmp/malicious.pkl`, scans the file with `ModelScan(settings=DEFAULT_SETTINGS)`, and if no issues are reported it does:
+
+```py
+pickle.loads(open('/tmp/malicious.pkl','rb').read())
+```
+
+If the scanner flags anything (or errors), it prints `no` and exits.
+
+**Goal:** Execute code and read `flag.txt`.
+
+---
+
+## Key insights
+
+* **23-byte budget.** Our entire pickle must fit in 23 bytes (after hex → bytes). Protocol 0 pickles are the shortest.
+* **Scanner is substringy.** It flags raw substrings like `os`, `system`, `pty`, and even `sh` *anywhere* in the 23-byte file.
+  (e.g., sending just `sh` → `no`.)
+* **Opcodes aren’t banned.** `GLOBAL` / `STACK_GLOBAL` pass; bogus imports yield real `ModuleNotFoundError`, so the scan happens *before* unpickle.
+* **Beat the scanner with a REPL.** If we call something harmless-looking (no `os`/`sh`) that drops us into Python, the scanner no longer mediates our keystrokes. Two perfect gadgets:
+
+  * `code.interact()` → interactive console (`>>>`)
+  * `pdb.set_trace()` → Pdb prompt (`(Pdb)`), where `!` runs Python
+
+Both fit well under 23 bytes in protocol 0 and avoid blacklisted substrings.
+
+---
+
+## Exploit
+
+### Plan
+
+1. Unpickle a **tiny** payload that calls `code.interact()` (or `pdb.set_trace()`), dodging all banned words.
+2. At the prompt, just `print(open("flag.txt").read())`.
+
+### Final payload (hex)
+
+Drop into a Python REPL (`code.interact`) — 22 bytes**
+
+```
+63636f64650a696e7465726163740a2874522e
+```
+
+Disassembly (protocol 0):
+
+```
+c code
+interact
+( t R .
+```
+
+### Usage
+
+<img width="663" height="170" alt="image" src="https://github.com/user-attachments/assets/1799b9d1-8cf5-45f3-903d-9074a3597ecd" />
+
+---
+
+## Why it passes the scan
+
+* **No banned substrings.** Payload bytes don’t contain `os`, `system`, `pty`, or `sh`.
+* **Within 23 bytes.** Both payloads survive the truncation intact.
+* **Scanner stops at unpickle boundary.** After `code.interact()`/`pdb.set_trace()` starts, your *typed* Python isn’t re-scanned; you can freely open and read files.
+
+---
+
+## Notes / sanity checks that helped
+
+* **Baseline pickles pass:** `4e2e` (`None`), `292e` (empty tuple) → silent success.
+* **Truncation is real:** A deliberately 25-byte pickle crashes at unpickle (no `no`), confirming the 23-byte slice.
+* **Substring blacklist confirmed:** sending `sh` alone (`7368`) ⇒ `no`.
+* **Opcodes allowed:** `GLOBAL 'zz zz'` causes `ModuleNotFoundError: No module named 'zz'` (so scan didn’t block the opcode).
+
+---
+
+## Takeaways
+
+* Signature/substring scanners are brittle; **don’t chase `os.system` golf** when a benign function gives you a REPL.
+* With pickles, any reachable callable is a gadget—**REPL/Debugger entries** are superb because they’re short and “safe”-looking.
+* Always **size your payload** against the exact byte budget before dealing with filters.
+
+---
+
+## Flag
+
+`jail{they_really_dont_care_bruh_fdf1d09caee6d95c}` 
 
 
+______
