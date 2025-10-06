@@ -126,9 +126,10 @@ running the payload shows this
 <img width="2326" height="182" alt="image" src="https://github.com/user-attachments/assets/98a15be8-9533-426d-9d9a-ff4d01ca6d85" />
 
 ________________________
-Challenge: calc 
-Category: pyjail
-Author: @quasarobizzaro
+
+# Challenge: calc 
+## Category: pyjail
+### Author: @quasarobizzaro
 Based on: “calc” for iCTF 2024 by maple3142
 
 Problem summary
