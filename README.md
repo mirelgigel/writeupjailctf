@@ -18,6 +18,8 @@ jail{welcome_to_jailctf_2025!!!}
 ```
 
 <img width="1466" height="350" alt="image" src="https://github.com/user-attachments/assets/c9939ebe-9a29-4657-8ef8-16b5e62dca3a" />
+
+
 <img width="1132" height="528" alt="image" src="https://github.com/user-attachments/assets/d9d5ff1d-dad3-4516-b297-0c795e474a05" />
 
 ______
@@ -56,7 +58,7 @@ Complex attribute/class introspection can work but is unnecessary here. The empt
 Flag:
 `jail{stderr_leak_5fd787f079eb69e}`
 <img width="1786" height="328" alt="image" src="https://github.com/user-attachments/assets/e3d3b92b-6d89-4d0e-8592-e4ead8f4ce5b" />
-______
+____________
 # Challenge: ASMaaSassembly (pyasm)
 
 Category: pwn / asm
@@ -82,7 +84,7 @@ Flag:
 `jail{yeah_just_include_flag.txt_lol}`
 
 <img width="2176" height="174" alt="image" src="https://github.com/user-attachments/assets/10ec3891-fc54-4bfe-bdc1-c98c0c35c94d" />
-_______
+____________
 # computer-monitor (pyjail) — short write-up
 
 ## Challenge summary
