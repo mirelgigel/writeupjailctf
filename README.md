@@ -1,4 +1,4 @@
-# Writeups made by team vianu_hack, by the players hara0621 and mapleleaf__. 
+# Writeups made by team vianu_hack, by the players hara and 🍁. 
 
 
 # Challenge: sanity 
