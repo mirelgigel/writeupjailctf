@@ -1,3 +1,6 @@
+# Writeups made by team vianu_hack, by the players hara0621 and mapleleaf__. 
+
+
 # Challenge: sanity 
 
 Category: social / sanity
