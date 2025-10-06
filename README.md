@@ -84,7 +84,9 @@ Flag:
 `jail{yeah_just_include_flag.txt_lol}`
 
 <img width="2176" height="174" alt="image" src="https://github.com/user-attachments/assets/10ec3891-fc54-4bfe-bdc1-c98c0c35c94d" />
+
 ____________
+
 # computer-monitor (pyjail)
 
 ## Challenge summary
