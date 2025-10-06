@@ -127,7 +127,7 @@ running the payload shows this
 
 ________________________
 
-# Challenge: calc 
+# Challenge: calc-defanged
 ## Category: pyjail
 ### Author: @quasarobizzaro
 Based on: “calc” for iCTF 2024 by maple3142
@@ -318,4 +318,67 @@ Build a one-liner that:
 **Flag:** `jail{it_was_prbably_schizophrenia_fad4cea2cfe8}` 
 
 _____
+
+# Challenge: rustjail
+## Category: misc / rustjail
+### Author: @wishhill
+Points: 1337
+
+## Problem
+
+A Python wrapper accepts exactly **one line** of Rust, whitelists characters, compiles it with `rustc`, then runs the produced binary:
+
+```py
+allowed = set(string.ascii_lowercase + string.digits + ' :._(){}"')
+
+inp = input("gib cod: ").strip()
+if not allowed.issuperset(set(inp)):
+    print("bad cod"); exit()
+
+with open("/tmp/cod.rs","w") as f: f.write(inp)
+os.system("/usr/local/cargo/bin/rustc /tmp/cod.rs -o /tmp/cod")
+os.system("/tmp/cod; echo Exited with status $?")
+```
+
+* **Allowed chars:** `a–z 0–9 space : . _ ( ) { } "`
+* **Goal:** print the flag stored next to the service (`flag.txt`).
+
+## Key insights
+
+* The filter **blocks** `! # = ; / , '` and uppercase. That kills all classic compile-time tricks:
+
+  * no `include_str!`, `compile_error!`, `include_bytes!`
+  * no `#[path="flag.txt"] mod …;`
+  * no `println!`
+* We therefore need a **runtime** read of `flag.txt`, but also a way to **print** the content **without** macros.
+* Rust’s `std::panic::panic_any(T)` is a **function** (not a macro). If we panic with the flag string, `rustc` will compile and the **runtime panic message prints the flag** to stderr.
+* Every token we need (`std::fs::read_to_string`, `panic_any`, `unwrap`, `"flag.txt"`) uses only allowed characters.
+
+## Exploit
+
+Make the compiled program read the flag and panic with it:
+
+1. Read the file: `std::fs::read_to_string("flag.txt")`
+2. Force the value to exist: `.unwrap()`
+3. Print without `println!` by **panicking with the string**: `std::panic::panic_any(...)`
+
+## Final payload
+
+```
+fn main(){std::panic::panic_any(std::fs::read_to_string("flag.txt").unwrap())}
+```
+
+## Run & result
+<img width="820" height="173" alt="image" src="https://github.com/user-attachments/assets/5dfb5165-cda2-46e3-8392-c016e265e48d" />
+
+## Why this passes the filter
+
+* **No banned characters:** uses only lowercase, digits, `: . _ ( ) { } "`.
+* **No macros/attributes:** `panic_any` is a normal function, not `panic!` or `println!`.
+* **No compile-time include needed:** file is read at runtime via `std::fs`.
+* **Printing without `println!`:** the panic handler prints our payload for us.
+
+______
+
+
 
