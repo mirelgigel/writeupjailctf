@@ -250,7 +250,7 @@ jail{but_does_your_desk_calculator_have_rce?_5c9cff7b71fc447d}
 
 _______
 
-# Challenge: primalpyjail
+# Challenge: primal
 
 **Category:** misc / pyjail
 **Author:** @oh_word
